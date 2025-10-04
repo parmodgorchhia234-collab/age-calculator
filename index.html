@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Age Calculator — Calculate your exact age</title>
+  <meta name="description" content="Simple age calculator to find exact years, months and days. Free and mobile friendly." />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f7f7fb; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .card { max-width:760px; margin:40px auto; padding:20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    footer { margin-top:18px; font-size:0.9rem; color:#666; text-align:center; }
+    .small-note { font-size:0.9rem; color:#444; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 class="h4 mb-2">Age Calculator</h1>
+    <p class="small-note">Enter your Date of Birth and get exact age in years, months & days. Compare with any date.</p>
+
+    <div class="row g-3 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label">Date of Birth</label>
+        <input id="dob" type="date" class="form-control" />
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">Compare to (optional)</label>
+        <input id="compare" type="date" class="form-control" />
+      </div>
+      <div class="col-md-2">
+        <button id="calcBtn" class="btn btn-primary w-100">Calculate</button>
+      </div>
+    </div>
+
+    <hr />
+
+    <div id="output" style="display:none;">
+      <h2 class="h6">Result</h2>
+      <p id="resText" class="fs-5 fw-semibold"></p>
+      <p id="extra" class="text-muted"></p>
+      <button id="resetBtn" class="btn btn-outline-secondary btn-sm mt-2">Reset</button>
+    </div>
+
+    <footer>Made with ❤️ — Free tool. Share if helpful!</footer>
+  </div>
+
+  <script>
+    function calcAge(birth, today) {
+      if (today < birth) return null;
+      let y1 = birth.getFullYear(), m1 = birth.getMonth(), d1 = birth.getDate();
+      let y2 = today.getFullYear(), m2 = today.getMonth(), d2 = today.getDate();
+
+      let year = y2 - y1;
+      let month = m2 - m1;
+      let day = d2 - d1;
+
+      if (day < 0) {
+        let prevMonth = new Date(y2, m2, 0); // last day of previous month
+        day += prevMonth.getDate();
+        month--;
+      }
+      if (month < 0) {
+        month += 12;
+        year--;
+      }
+
+      const msPerDay = 24*60*60*1000;
+      const totalDays = Math.floor((today - birth) / msPerDay);
+
+      return { year, month, day, totalDays };
+    }
+
+    const calcBtn = document.getElementById('calcBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    calcBtn.addEventListener('click', () => {
+      const dobVal = document.getElementById('dob').value;
+      if (!dobVal) { alert('Please choose your Date of Birth'); return; }
+      const compareVal = document.getElementById('compare').value;
+      const birth = new Date(dobVal);
+      const today = compareVal ? new Date(compareVal) : new Date();
+
+      const res = calcAge(birth, today);
+      if (!res) { alert('Compare date is before birth date.'); return; }
+
+      document.getElementById('resText').innerText = `${res.year} years, ${res.month} months, and ${res.day} days`;
+      document.getElementById('extra').innerText = `Total days: ${res.totalDays.toLocaleString()}  •  Born on: ${birth.toDateString()}`;
+      document.getElementById('output').style.display = 'block';
+    });
+
+    resetBtn.addEventListener('click', () => {
+      document.getElementById('dob').value = '';
+      document.getElementById('compare').value = '';
+      document.getElementById('output').style.display = 'none';
+    });
+  </script>
+</body>
+</html>
